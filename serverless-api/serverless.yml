@@ -1,0 +1,35 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: nivaldoandrade
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: serverless-api
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  architecture: arm64
+  memorySize: 128
+  region: sa-east-1
+  # Uncomment to easily set up a custom domain. Read the docs for more details:
+  # https://www.serverless.com/framework/docs/providers/aws/guide/domains
+  # domain: api.example.com
+
+package:
+  individually: true
+
+build:
+  esbuild:
+    bundle: true
+    minify: true
+    sourcemap: false
+    exclude:
+      - '@aws-sdk/*'
+    external:
+      - '@aws-sdk/*'
+
+functions:
+  createImage:
+    handler: src/functions/createImage.handler
+    events:
+      - httpApi:
+          path: /create-image
+          method: post
