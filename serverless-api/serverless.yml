@@ -9,9 +9,15 @@ provider:
   architecture: arm64
   memorySize: 128
   region: sa-east-1
-  # Uncomment to easily set up a custom domain. Read the docs for more details:
-  # https://www.serverless.com/framework/docs/providers/aws/guide/domains
-  # domain: api.example.com
+  environment:
+    FILE_BUCKET_NAME: !Ref FileBucket
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: s3:PutObject
+          Resource: !Sub ${FileBucket.Arn}/*
+
 
 package:
   individually: true
@@ -25,6 +31,14 @@ build:
       - '@aws-sdk/*'
     external:
       - '@aws-sdk/*'
+
+resources:
+  Resources:
+    FileBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-${sls:stage}-file-bucket
+
 
 functions:
   createImage:
