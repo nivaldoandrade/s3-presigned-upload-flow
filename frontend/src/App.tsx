@@ -1,14 +1,26 @@
 import { PackageOpenIcon, PlusIcon, XIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Button } from './components/ui/button';
 import { cn } from './lib/utils';
+import { uploadFile } from './services/uploadFile';
 
 function App() {
   const [files, setFiles] = useState<File[]>([]);
-  // TODO: Implement upload flow
-  function handleUploadFiles() {
-    console.log('Upload files');
+  const [isLoading, startTransition] = useTransition();
+
+  async function handleUploadFiles() {
+    startTransition(async () => {
+      const response = await Promise.allSettled(files.map(uploadFile));
+
+      response.forEach((response, index) => {
+        if (response.status === 'rejected') {
+          console.log(
+            `O upload do arquivo ${files[index].name} deu erro.`,
+          );
+        }
+      });
+    });
   }
 
   function handleRemoveFile(index: number) {
@@ -76,6 +88,7 @@ function App() {
             <Button
               className='w-full mt-8 p-6'
               onClick={handleUploadFiles}
+              disabled={isLoading}
             >
               Confirmar o upload
             </Button>
