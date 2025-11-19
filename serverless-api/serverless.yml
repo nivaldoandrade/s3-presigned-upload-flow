@@ -9,6 +9,8 @@ provider:
   architecture: arm64
   memorySize: 128
   region: sa-east-1
+  httpApi:
+    cors: true
   environment:
     FILE_BUCKET_NAME: !Ref FileBucket
   iam:
@@ -38,6 +40,14 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:service}-${sls:stage}-file-bucket
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - PUT
+              AllowedOrigins:
+                - 'http://localhost:5173'
 
 
 functions:
