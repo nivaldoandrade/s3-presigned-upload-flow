@@ -36,7 +36,7 @@ export default defineConfig([
             match: true,
           },
         },
-      ],
+      ]
     },
   },
   globalIgnores(['dist']),
@@ -52,5 +52,11 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    }
   }
 ])
