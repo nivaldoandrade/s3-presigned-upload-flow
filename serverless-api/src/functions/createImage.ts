@@ -1,7 +1,9 @@
 import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { PutCommand } from '@aws-sdk/lib-dynamodb';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import * as z from 'zod/mini';
+import { dynamoClient } from '../clients/dynamoClient';
 import { s3Client } from '../clients/s3Client';
 import { env } from '../config/env';
 import { bodyParser } from '../utils/bodyParser';
@@ -37,9 +39,19 @@ export async function handler(event: APIGatewayProxyEventV2) {
     Key: fileKey,
   });
 
+  const putItemCommand = new PutCommand({
+    TableName: env.TABLE_NAME,
+    Item: {
+      id: fileKey,
+      status: 'PENDING',
+    },
+  });
+
   const preSignedUrl = await getSignedUrl(s3Client, commmand, {
     expiresIn: 60, //1min
   });
+
+  await dynamoClient.send(putItemCommand);
 
   return lambdaHttpResponse(200, {
     message: preSignedUrl,

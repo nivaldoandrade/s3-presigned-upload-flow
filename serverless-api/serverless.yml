@@ -13,12 +13,16 @@ provider:
     cors: true
   environment:
     FILE_BUCKET_NAME: !Ref FileBucket
+    TABLE_NAME: !Ref MainTable
   iam:
     role:
       statements:
         - Effect: Allow
           Action: s3:PutObject
           Resource: !Sub ${FileBucket.Arn}/*
+        - Effect: Allow
+          Action: dynamodb:PutItem
+          Resource: !Sub ${MainTable.Arn}
 
 
 package:
@@ -48,6 +52,17 @@ resources:
                 - PUT
               AllowedOrigins:
                 - 'http://localhost:5173'
+    MainTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${sls:stage}-MainTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
 
 
 functions:
