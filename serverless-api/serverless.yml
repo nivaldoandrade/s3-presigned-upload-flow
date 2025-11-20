@@ -21,7 +21,9 @@ provider:
           Action: s3:PutObject
           Resource: !Sub ${FileBucket.Arn}/*
         - Effect: Allow
-          Action: dynamodb:PutItem
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
           Resource: !Sub ${MainTable.Arn}
 
 
@@ -72,3 +74,11 @@ functions:
       - httpApi:
           path: /create-image
           method: post
+  newUploadFileTrigger:
+    handler: src/functions/triggers/newUploadFileTrigger.handler
+    events:
+      - s3:
+          bucket: !Ref FileBucket
+          event: s3:ObjectCreated:Put
+          existing: true
+          forceDeploy: true
