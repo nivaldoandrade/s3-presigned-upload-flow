@@ -44,6 +44,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
     Item: {
       id: fileKey,
       status: 'PENDING',
+      expireAt: Date.now() + 60 * 1000,
     },
   });
 

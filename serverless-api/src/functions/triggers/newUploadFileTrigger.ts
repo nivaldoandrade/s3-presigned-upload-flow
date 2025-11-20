@@ -13,7 +13,7 @@ export async function handler(event: S3Event) {
     Key: {
       id,
     },
-    UpdateExpression: 'SET #status = :status',
+    UpdateExpression: 'SET #status = :status REMOVE expireAt',
     ExpressionAttributeNames: {
       '#status': 'status',
     },
