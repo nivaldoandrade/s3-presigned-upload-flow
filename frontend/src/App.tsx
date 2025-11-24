@@ -12,8 +12,14 @@ interface IUpload {
 };
 
 function App() {
+  const [isAllCompleted, setIsAllCompleted] = useState(false);
   const [uploads, setUploads] = useState<IUpload[]>([]);
   const [isLoading, startTransition] = useTransition();
+
+  function handleRemoveAllFile() {
+    setIsAllCompleted(false);
+    setUploads([]);
+  }
 
   async function handleUploads() {
     startTransition(async () => {
@@ -40,6 +46,8 @@ function App() {
           );
         }
       });
+
+      setIsAllCompleted(true);
     });
   }
 
@@ -68,7 +76,7 @@ function App() {
 
   return (
     <div className='min-h-svh flex justify-center'>
-      <div className='w-full max-w-2xl mt-10 px-4'>
+      <div className='w-full max-w-2xl my-10 px-4'>
         <div
           {...getRootProps()}
           className={cn(
@@ -96,10 +104,14 @@ function App() {
 
         {uploads.length > 0 && (
           <div className='mt-10'>
-            <h2 className="text-2xl font-medium">
-              Arquivos Selecionados ({uploads.length})
-            </h2>
-            <div className='mt-2'>
+            <div className='flex items-center justify-between'>
+              <h2 className="text-2xl font-medium">
+                Arquivos Selecionados ({uploads.length})
+              </h2>
+              <Button variant='outline' onClick={handleRemoveAllFile}>Clear all</Button>
+            </div>
+
+            <div className='mt-4'>
               {uploads.map(({ file, progress }, index) => (
                 <div key={file.name} className='border-b-2 min-h-16 p-1 flex justify-between items-center gap-2'>
                   <span className='truncate'>{file.name}</span>
@@ -140,9 +152,9 @@ function App() {
             <Button
               className='w-full mt-8 p-6'
               onClick={handleUploads}
-              disabled={isLoading}
+              disabled={isLoading || isAllCompleted}
             >
-              Confirmar o upload
+              Enviar
             </Button>
           </div>
         )}
